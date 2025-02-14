@@ -1,5 +1,6 @@
 import { Receipt } from "lucide-react";
 import { convertCurrency } from "../utils/currency";
+import { motion } from "framer-motion";
 
 const AssignmentSummary = ({ invoice, selectedNotes }) => {
   const invoiceAmounts = convertCurrency(invoice.amount, invoice.currency);
@@ -15,12 +16,15 @@ const AssignmentSummary = ({ invoice, selectedNotes }) => {
   const newAmount = convertCurrency(invoiceAmount - totalDeduction, "CLP");
 
   return (
-    <div className="mt-6 mb-6 bg-white rounded-lg shadow-sm border border-gray-100">
+    <motion.div
+      layout
+      className="mt-6 mb-6 bg-white rounded-lg shadow-sm border border-gray-100"
+    >
       <div className="p-4">
-        <h3 className="font-medium text-gray-900 mb-4">
+        <motion.h3 layout className="font-medium text-gray-900 mb-4">
           Resumen de asignación
-        </h3>
-        <div className="space-y-3">
+        </motion.h3>
+        <motion.div layout className="space-y-3">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <Receipt className="w-4 h-4 text-gray-400" />
@@ -39,8 +43,12 @@ const AssignmentSummary = ({ invoice, selectedNotes }) => {
           {selectedNotes.map((note, index) => {
             const noteAmounts = convertCurrency(note.amount, note.currency);
             return (
-              <div
+              <motion.div
                 key={note.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ delay: index * 0.1 }}
                 className="flex justify-between items-center pl-6"
               >
                 <div className="flex items-center gap-2">
@@ -57,7 +65,7 @@ const AssignmentSummary = ({ invoice, selectedNotes }) => {
                     (-{noteAmounts.formatted.usd} USD)
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
 
@@ -74,9 +82,9 @@ const AssignmentSummary = ({ invoice, selectedNotes }) => {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

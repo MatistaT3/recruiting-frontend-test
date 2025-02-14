@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useInvoices } from "../hooks/useInvoices";
 import { convertCurrency } from "../utils/currency";
 import CreditNoteList from "./CreditNoteList";
+import { motion, AnimatePresence } from "framer-motion";
 
 const InvoiceList = () => {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -22,25 +23,41 @@ const InvoiceList = () => {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto p-4 sm:p-6">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="max-w-3xl mx-auto p-4 sm:p-6"
+      >
         <p>Cargando facturas...</p>
-      </div>
+      </motion.div>
     );
   }
 
   if (error) {
     return (
-      <div className="max-w-3xl mx-auto p-4 sm:p-6">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="max-w-3xl mx-auto p-4 sm:p-6"
+      >
         <p className="text-red-500">Error: {error}</p>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-4 sm:p-6">
-      <h1 className="text-xl sm:text-2xl font-semibold text-center mb-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-3xl mx-auto p-4 sm:p-6"
+    >
+      <motion.h1
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-xl sm:text-2xl font-semibold text-center mb-6"
+      >
         Selecciona una factura
-      </h1>
+      </motion.h1>
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="hidden sm:grid sm:grid-cols-3 gap-4 p-4 bg-gray-50 border-b font-medium text-gray-600">
           <div>Empresa</div>
@@ -49,11 +66,14 @@ const InvoiceList = () => {
         </div>
 
         <div className="divide-y">
-          {invoices.map((invoice) => {
+          {invoices.map((invoice, index) => {
             const amounts = convertCurrency(invoice.amount, invoice.currency);
             return (
-              <label
+              <motion.label
                 key={invoice.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
                 className={`flex flex-col sm:grid sm:grid-cols-3 gap-2 sm:gap-4 p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
                   selectedInvoice === invoice.id
                     ? "bg-blue-50 hover:bg-blue-50"
@@ -91,23 +111,25 @@ const InvoiceList = () => {
                     Recibida
                   </span>
                 </div>
-              </label>
+              </motion.label>
             );
           })}
         </div>
       </div>
 
-      {selectedInvoice && (
-        <CreditNoteList
-          creditNotes={getCreditNotesForInvoice(selectedInvoice)}
-          onSelect={setSelectedCreditNote}
-          onReset={handleReset}
-          selectedInvoice={invoices.find((inv) => inv.id === selectedInvoice)}
-          onUpdateInvoice={updateInvoiceAmount}
-          onMarkAsAssigned={markCreditNotesAsAssigned}
-        />
-      )}
-    </div>
+      <AnimatePresence mode="wait">
+        {selectedInvoice && (
+          <CreditNoteList
+            creditNotes={getCreditNotesForInvoice(selectedInvoice)}
+            onSelect={setSelectedCreditNote}
+            onReset={handleReset}
+            selectedInvoice={invoices.find((inv) => inv.id === selectedInvoice)}
+            onUpdateInvoice={updateInvoiceAmount}
+            onMarkAsAssigned={markCreditNotesAsAssigned}
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
