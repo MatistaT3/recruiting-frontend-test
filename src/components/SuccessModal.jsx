@@ -6,10 +6,6 @@ const SuccessModal = ({ onContinue, summary }) => {
     summary.invoice.amount,
     summary.invoice.currency
   );
-  const creditNoteAmounts = convertCurrency(
-    summary.creditNote.amount,
-    summary.creditNote.currency
-  );
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -49,20 +45,33 @@ const SuccessModal = ({ onContinue, summary }) => {
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <Receipt className="w-5 h-5 text-gray-400" />
-                        <span className="text-gray-600">Nota de Crédito</span>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-medium text-red-600">
-                          -{creditNoteAmounts.formatted.clp} CLP
+                    {summary.creditNotes.map((note, index) => {
+                      const noteAmounts = convertCurrency(
+                        note.amount,
+                        note.currency
+                      );
+                      return (
+                        <div
+                          key={note.id}
+                          className="flex justify-between items-center"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Receipt className="w-5 h-5 text-gray-400" />
+                            <span className="text-gray-600">
+                              Nota de Crédito {index + 1}
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-medium text-red-600">
+                              -{noteAmounts.formatted.clp} CLP
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              (-{noteAmounts.formatted.usd} USD)
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-500">
-                          (-{creditNoteAmounts.formatted.usd} USD)
-                        </div>
-                      </div>
-                    </div>
+                      );
+                    })}
 
                     <div className="pt-4 border-t">
                       <div className="flex justify-between items-center">

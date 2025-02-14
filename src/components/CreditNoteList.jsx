@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { convertCurrency, calculateNewAmount } from "../utils/currency";
+import { convertCurrency } from "../utils/currency";
 import SuccessModal from "./SuccessModal";
 import Loading from "./Loading";
 
@@ -10,27 +10,48 @@ const CreditNoteList = ({
   selectedInvoice,
   onUpdateInvoice,
 }) => {
-  const [selectedCreditNote, setSelectedCreditNote] = useState(null);
+  const [selectedCreditNotes, setSelectedCreditNotes] = useState(new Set());
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [assignmentSummary, setAssignmentSummary] = useState(null);
 
   const handleCreditNoteSelect = (creditNoteId) => {
-    setSelectedCreditNote(creditNoteId);
-    onSelect(creditNoteId);
+    setSelectedCreditNotes((prev) => {
+      const newSelection = new Set(prev);
+      if (newSelection.has(creditNoteId)) {
+        newSelection.delete(creditNoteId);
+      } else {
+        newSelection.add(creditNoteId);
+      }
+      return newSelection;
+    });
+  };
+
+  const calculateTotalDeduction = (selectedNotes) => {
+    return selectedNotes.reduce((total, note) => {
+      const noteAmount =
+        note.currency === "USD" ? note.amount * 1000 : note.amount;
+      return total + noteAmount;
+    }, 0);
   };
 
   const handleAssign = () => {
-    const selectedNote = creditNotes.find(
-      (note) => note.id === selectedCreditNote
+    const selectedNotes = Array.from(selectedCreditNotes).map((id) =>
+      creditNotes.find((note) => note.id === id)
     );
 
-    const newAmount = calculateNewAmount(selectedInvoice, selectedNote);
+    const totalDeduction = calculateTotalDeduction(selectedNotes);
+    const invoiceAmount =
+      selectedInvoice.currency === "USD"
+        ? selectedInvoice.amount * 1000
+        : selectedInvoice.amount;
+
+    const newAmount = convertCurrency(invoiceAmount - totalDeduction, "CLP");
 
     const assignmentSummary = {
       invoice: selectedInvoice,
-      creditNote: selectedNote,
-      newAmount: newAmount.clp,
+      creditNotes: selectedNotes,
+      totalDeduction: convertCurrency(totalDeduction, "CLP"),
       formattedNewAmount: newAmount,
     };
 
@@ -55,7 +76,7 @@ const CreditNoteList = ({
     );
 
     setIsLoading(false);
-    setSelectedCreditNote(null);
+    setSelectedCreditNotes(new Set());
     onReset();
   };
 
@@ -91,18 +112,17 @@ const CreditNoteList = ({
                   <label
                     key={creditNote.id}
                     className={`flex flex-col sm:grid sm:grid-cols-3 gap-2 sm:gap-4 p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                      selectedCreditNote === creditNote.id
+                      selectedCreditNotes.has(creditNote.id)
                         ? "bg-blue-50 hover:bg-blue-50"
                         : ""
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <input
-                        type="radio"
-                        name="creditNote"
+                        type="checkbox"
                         value={creditNote.id}
-                        checked={selectedCreditNote === creditNote.id}
-                        onChange={(e) => handleCreditNoteSelect(e.target.value)}
+                        checked={selectedCreditNotes.has(creditNote.id)}
+                        onChange={() => handleCreditNoteSelect(creditNote.id)}
                         className="w-4 h-4 text-black-600 cursor-pointer"
                       />
                       <span className="font-medium capitalize">
@@ -132,13 +152,14 @@ const CreditNoteList = ({
         )}
       </div>
 
-      {selectedCreditNote && (
+      {selectedCreditNotes.size > 0 && (
         <div className="mt-6 flex justify-center">
           <button
             onClick={handleAssign}
             className="bg-indigo-600 text-white py-3 px-8 rounded-lg hover:bg-indigo-700 transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg font-semibold text-lg"
           >
-            Asignar nota de crédito
+            Asignar {selectedCreditNotes.size} nota
+            {selectedCreditNotes.size !== 1 ? "s" : ""} de crédito
           </button>
         </div>
       )}
