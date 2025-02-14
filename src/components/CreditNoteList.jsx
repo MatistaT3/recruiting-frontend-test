@@ -8,6 +8,7 @@ const CreditNoteList = ({
   onSelect,
   onReset,
   selectedInvoice,
+  onUpdateInvoice,
 }) => {
   const [selectedCreditNote, setSelectedCreditNote] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -41,6 +42,18 @@ const CreditNoteList = ({
     setShowSuccessModal(false);
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const amountInOriginalCurrency =
+      selectedInvoice.currency === "USD"
+        ? assignmentSummary.formattedNewAmount.usd
+        : assignmentSummary.formattedNewAmount.clp;
+
+    onUpdateInvoice(
+      selectedInvoice.id,
+      Number(amountInOriginalCurrency),
+      selectedInvoice.currency
+    );
+
     setIsLoading(false);
     setSelectedCreditNote(null);
     onReset();

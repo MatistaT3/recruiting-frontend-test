@@ -10,6 +10,8 @@ export const useInvoices = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const EXCHANGE_RATE = 1000;
+
   useEffect(() => {
     fetchInvoices();
   }, []);
@@ -35,5 +37,30 @@ export const useInvoices = () => {
     return creditNotes.filter((note) => note.reference === invoiceId);
   };
 
-  return { invoices, loading, error, getCreditNotesForInvoice };
+  const updateInvoiceAmount = (invoiceId, newAmount, currency = "CLP") => {
+    setInvoices((currentInvoices) =>
+      currentInvoices.map((invoice) =>
+        invoice.id === invoiceId
+          ? {
+              ...invoice,
+              amount:
+                currency === invoice.currency
+                  ? newAmount
+                  : currency === "CLP"
+                  ? newAmount / EXCHANGE_RATE
+                  : newAmount * EXCHANGE_RATE,
+              currency: invoice.currency,
+            }
+          : invoice
+      )
+    );
+  };
+
+  return {
+    invoices,
+    loading,
+    error,
+    getCreditNotesForInvoice,
+    updateInvoiceAmount,
+  };
 };

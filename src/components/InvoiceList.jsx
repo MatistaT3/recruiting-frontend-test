@@ -6,7 +6,13 @@ import CreditNoteList from "./CreditNoteList";
 const InvoiceList = () => {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [selectedCreditNote, setSelectedCreditNote] = useState(null);
-  const { invoices, loading, error, getCreditNotesForInvoice } = useInvoices();
+  const {
+    invoices,
+    loading,
+    error,
+    getCreditNotesForInvoice,
+    updateInvoiceAmount,
+  } = useInvoices();
 
   const handleReset = () => {
     setSelectedInvoice(null);
@@ -96,6 +102,7 @@ const InvoiceList = () => {
           onSelect={setSelectedCreditNote}
           onReset={handleReset}
           selectedInvoice={invoices.find((inv) => inv.id === selectedInvoice)}
+          onUpdateInvoice={updateInvoiceAmount}
         />
       )}
     </div>
