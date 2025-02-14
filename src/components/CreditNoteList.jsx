@@ -2,6 +2,7 @@ import { useState } from "react";
 import { convertCurrency } from "../utils/currency";
 import SuccessModal from "./SuccessModal";
 import Loading from "./Loading";
+import AssignmentSummary from "./AssignmentSummary";
 
 const CreditNoteList = ({
   creditNotes,
@@ -9,6 +10,7 @@ const CreditNoteList = ({
   onReset,
   selectedInvoice,
   onUpdateInvoice,
+  onMarkAsAssigned,
 }) => {
   const [selectedCreditNotes, setSelectedCreditNotes] = useState(new Set());
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -75,10 +77,16 @@ const CreditNoteList = ({
       selectedInvoice.currency
     );
 
+    onMarkAsAssigned(Array.from(selectedCreditNotes));
+
     setIsLoading(false);
     setSelectedCreditNotes(new Set());
     onReset();
   };
+
+  const selectedNotesList = Array.from(selectedCreditNotes).map((id) =>
+    creditNotes.find((note) => note.id === id)
+  );
 
   if (isLoading) {
     return <Loading />;
@@ -151,6 +159,13 @@ const CreditNoteList = ({
           </>
         )}
       </div>
+
+      {selectedCreditNotes.size > 0 && (
+        <AssignmentSummary
+          invoice={selectedInvoice}
+          selectedNotes={selectedNotesList}
+        />
+      )}
 
       {selectedCreditNotes.size > 0 && (
         <div className="mt-6 flex justify-center">

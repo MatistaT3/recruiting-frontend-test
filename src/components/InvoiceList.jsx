@@ -12,6 +12,7 @@ const InvoiceList = () => {
     error,
     getCreditNotesForInvoice,
     updateInvoiceAmount,
+    markCreditNotesAsAssigned,
   } = useInvoices();
 
   const handleReset = () => {
@@ -103,6 +104,7 @@ const InvoiceList = () => {
           onReset={handleReset}
           selectedInvoice={invoices.find((inv) => inv.id === selectedInvoice)}
           onUpdateInvoice={updateInvoiceAmount}
+          onMarkAsAssigned={markCreditNotesAsAssigned}
         />
       )}
     </div>

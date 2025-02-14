@@ -34,7 +34,9 @@ export const useInvoices = () => {
   };
 
   const getCreditNotesForInvoice = (invoiceId) => {
-    return creditNotes.filter((note) => note.reference === invoiceId);
+    return creditNotes.filter(
+      (note) => note.reference === invoiceId && !note.assigned
+    );
   };
 
   const updateInvoiceAmount = (invoiceId, newAmount, currency = "CLP") => {
@@ -56,11 +58,20 @@ export const useInvoices = () => {
     );
   };
 
+  const markCreditNotesAsAssigned = (noteIds) => {
+    setCreditNotes((currentNotes) =>
+      currentNotes.map((note) =>
+        noteIds.includes(note.id) ? { ...note, assigned: true } : note
+      )
+    );
+  };
+
   return {
     invoices,
     loading,
     error,
     getCreditNotesForInvoice,
     updateInvoiceAmount,
+    markCreditNotesAsAssigned,
   };
 };
