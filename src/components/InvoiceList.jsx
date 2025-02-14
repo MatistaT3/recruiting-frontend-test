@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useInvoices } from "../hooks/useInvoices";
 import { convertCurrency } from "../utils/currency";
+import CreditNoteList from "./CreditNoteList";
 
 const InvoiceList = () => {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
-  const { invoices, loading, error } = useInvoices();
+  const [selectedCreditNote, setSelectedCreditNote] = useState(null);
+  const { invoices, loading, error, getCreditNotesForInvoice } = useInvoices();
 
   if (loading) {
     return (
@@ -55,9 +57,12 @@ const InvoiceList = () => {
                     onChange={(e) => setSelectedInvoice(e.target.value)}
                     className="w-4 h-4 text-black-600 cursor-pointer"
                   />
-                  <span className="font-medium capitalize">
-                    {invoice.organization_id}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="font-medium capitalize">
+                      {invoice.organization_id}
+                    </span>
+                    <span className="text-gray-500 text-sm">{invoice.id}</span>
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-center gap-2 ml-7 sm:ml-0 whitespace-nowrap">
@@ -79,6 +84,13 @@ const InvoiceList = () => {
           })}
         </div>
       </div>
+
+      {selectedInvoice && (
+        <CreditNoteList
+          creditNotes={getCreditNotesForInvoice(selectedInvoice)}
+          onSelect={setSelectedCreditNote}
+        />
+      )}
     </div>
   );
 };

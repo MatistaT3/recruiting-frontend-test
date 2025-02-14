@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
-import { getInvoices } from "../services/invoiceService";
+import {
+  getReceivedInvoices,
+  getCreditNotes,
+} from "../services/invoiceService";
 
 export const useInvoices = () => {
   const [invoices, setInvoices] = useState([]);
+  const [creditNotes, setCreditNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -13,8 +17,13 @@ export const useInvoices = () => {
   const fetchInvoices = async () => {
     try {
       setLoading(true);
-      const data = await getInvoices();
-      setInvoices(data);
+      const [receivedInvoices, allCreditNotes] = await Promise.all([
+        getReceivedInvoices(),
+        getCreditNotes(),
+      ]);
+
+      setInvoices(receivedInvoices);
+      setCreditNotes(allCreditNotes);
     } catch (error) {
       setError(error.message);
     } finally {
@@ -22,5 +31,9 @@ export const useInvoices = () => {
     }
   };
 
-  return { invoices, loading, error };
+  const getCreditNotesForInvoice = (invoiceId) => {
+    return creditNotes.filter((note) => note.reference === invoiceId);
+  };
+
+  return { invoices, loading, error, getCreditNotesForInvoice };
 };
