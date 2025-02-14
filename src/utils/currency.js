@@ -1,5 +1,24 @@
 const EXCHANGE_RATE = 1000;
 
+export const calculateNewAmount = (invoice, creditNote) => {
+  const invoiceInCLP =
+    invoice.currency === "USD"
+      ? invoice.amount * EXCHANGE_RATE
+      : invoice.amount;
+
+  const creditNoteInCLP =
+    creditNote.currency === "USD"
+      ? creditNote.amount * EXCHANGE_RATE
+      : creditNote.amount;
+
+  const newAmountCLP = invoiceInCLP - creditNoteInCLP;
+
+  return {
+    clp: newAmountCLP,
+    ...convertCurrency(newAmountCLP, "CLP"),
+  };
+};
+
 export const convertCurrency = (amount, fromCurrency) => {
   if (fromCurrency === "CLP") {
     const usdAmount = amount / EXCHANGE_RATE;

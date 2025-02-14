@@ -1,12 +1,18 @@
 import { useState } from "react";
-import { convertCurrency } from "../utils/currency";
+import { convertCurrency, calculateNewAmount } from "../utils/currency";
 import SuccessModal from "./SuccessModal";
 import Loading from "./Loading";
 
-const CreditNoteList = ({ creditNotes, onSelect, onReset }) => {
+const CreditNoteList = ({
+  creditNotes,
+  onSelect,
+  onReset,
+  selectedInvoice,
+}) => {
   const [selectedCreditNote, setSelectedCreditNote] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [assignmentSummary, setAssignmentSummary] = useState(null);
 
   const handleCreditNoteSelect = (creditNoteId) => {
     setSelectedCreditNote(creditNoteId);
@@ -14,7 +20,21 @@ const CreditNoteList = ({ creditNotes, onSelect, onReset }) => {
   };
 
   const handleAssign = () => {
+    const selectedNote = creditNotes.find(
+      (note) => note.id === selectedCreditNote
+    );
+
+    const newAmount = calculateNewAmount(selectedInvoice, selectedNote);
+
+    const assignmentSummary = {
+      invoice: selectedInvoice,
+      creditNote: selectedNote,
+      newAmount: newAmount.clp,
+      formattedNewAmount: newAmount,
+    };
+
     setShowSuccessModal(true);
+    setAssignmentSummary(assignmentSummary);
   };
 
   const handleContinue = async () => {
@@ -110,7 +130,9 @@ const CreditNoteList = ({ creditNotes, onSelect, onReset }) => {
         </div>
       )}
 
-      {showSuccessModal && <SuccessModal onContinue={handleContinue} />}
+      {showSuccessModal && (
+        <SuccessModal onContinue={handleContinue} summary={assignmentSummary} />
+      )}
     </div>
   );
 };

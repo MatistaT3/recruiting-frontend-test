@@ -95,6 +95,7 @@ const InvoiceList = () => {
           creditNotes={getCreditNotesForInvoice(selectedInvoice)}
           onSelect={setSelectedCreditNote}
           onReset={handleReset}
+          selectedInvoice={invoices.find((inv) => inv.id === selectedInvoice)}
         />
       )}
     </div>
