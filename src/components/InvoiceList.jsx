@@ -17,8 +17,10 @@ const InvoiceList = () => {
   } = useInvoices();
 
   const handleReset = () => {
-    setSelectedInvoice(null);
     setSelectedCreditNote(null);
+    setTimeout(() => {
+      setSelectedInvoice(null);
+    }, 300);
   };
 
   if (loading) {
@@ -118,15 +120,25 @@ const InvoiceList = () => {
       </div>
 
       <AnimatePresence mode="wait">
-        {selectedInvoice && (
-          <CreditNoteList
-            creditNotes={getCreditNotesForInvoice(selectedInvoice)}
-            onSelect={setSelectedCreditNote}
-            onReset={handleReset}
-            selectedInvoice={invoices.find((inv) => inv.id === selectedInvoice)}
-            onUpdateInvoice={updateInvoiceAmount}
-            onMarkAsAssigned={markCreditNotesAsAssigned}
-          />
+        {selectedInvoice && !loading && (
+          <motion.div
+            key="credit-note-list"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <CreditNoteList
+              creditNotes={getCreditNotesForInvoice(selectedInvoice)}
+              onSelect={setSelectedCreditNote}
+              onReset={handleReset}
+              selectedInvoice={invoices.find(
+                (inv) => inv.id === selectedInvoice
+              )}
+              onUpdateInvoice={updateInvoiceAmount}
+              onMarkAsAssigned={markCreditNotesAsAssigned}
+            />
+          </motion.div>
         )}
       </AnimatePresence>
     </motion.div>

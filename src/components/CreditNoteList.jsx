@@ -65,7 +65,6 @@ const CreditNoteList = ({
   const handleContinue = async () => {
     setShowSuccessModal(false);
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const amountInOriginalCurrency =
       selectedInvoice.currency === "USD"
@@ -77,12 +76,13 @@ const CreditNoteList = ({
       Number(amountInOriginalCurrency),
       selectedInvoice.currency
     );
-
     onMarkAsAssigned(Array.from(selectedCreditNotes));
+    onReset();
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     setIsLoading(false);
     setSelectedCreditNotes(new Set());
-    onReset();
   };
 
   const selectedNotesList = Array.from(selectedCreditNotes).map((id) =>
