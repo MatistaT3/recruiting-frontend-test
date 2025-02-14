@@ -8,6 +8,11 @@ const InvoiceList = () => {
   const [selectedCreditNote, setSelectedCreditNote] = useState(null);
   const { invoices, loading, error, getCreditNotesForInvoice } = useInvoices();
 
+  const handleReset = () => {
+    setSelectedInvoice(null);
+    setSelectedCreditNote(null);
+  };
+
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto p-4 sm:p-6">
@@ -89,6 +94,7 @@ const InvoiceList = () => {
         <CreditNoteList
           creditNotes={getCreditNotesForInvoice(selectedInvoice)}
           onSelect={setSelectedCreditNote}
+          onReset={handleReset}
         />
       )}
     </div>

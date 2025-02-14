@@ -1,13 +1,34 @@
 import { useState } from "react";
 import { convertCurrency } from "../utils/currency";
+import SuccessModal from "./SuccessModal";
+import Loading from "./Loading";
 
-const CreditNoteList = ({ creditNotes, onSelect }) => {
+const CreditNoteList = ({ creditNotes, onSelect, onReset }) => {
   const [selectedCreditNote, setSelectedCreditNote] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCreditNoteSelect = (creditNoteId) => {
     setSelectedCreditNote(creditNoteId);
     onSelect(creditNoteId);
   };
+
+  const handleAssign = () => {
+    setShowSuccessModal(true);
+  };
+
+  const handleContinue = async () => {
+    setShowSuccessModal(false);
+    setIsLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setIsLoading(false);
+    setSelectedCreditNote(null);
+    onReset();
+  };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="mt-8">
@@ -77,6 +98,19 @@ const CreditNoteList = ({ creditNotes, onSelect }) => {
           </>
         )}
       </div>
+
+      {selectedCreditNote && (
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={handleAssign}
+            className="bg-indigo-600 text-white py-3 px-8 rounded-lg hover:bg-indigo-700 transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg font-semibold text-lg"
+          >
+            Asignar nota de crédito
+          </button>
+        </div>
+      )}
+
+      {showSuccessModal && <SuccessModal onContinue={handleContinue} />}
     </div>
   );
 };
